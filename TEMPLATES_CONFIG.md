@@ -67,6 +67,7 @@ build-backend = "poetry.core.masonry.api"
 ## ⚙️ config/settings.py (segmentos importantes)
 
 ### Imports e Configurações Base
+
 ```python
 from pathlib import Path
 from decouple import config
@@ -88,13 +89,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
     'drf_spectacular',
-    
+
     # Local apps
     'professionals',
     'appointments',
@@ -135,6 +136,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 ```
 
 ### Database
+
 ```python
 DATABASES = {
     'default': {
@@ -149,6 +151,7 @@ DATABASES = {
 ```
 
 ### Password Validation
+
 ```python
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -167,6 +170,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ```
 
 ### Internationalization
+
 ```python
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
@@ -175,6 +179,7 @@ USE_TZ = True
 ```
 
 ### Static Files
+
 ```python
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -183,11 +188,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 ```
 
 ### Default Primary Key
+
 ```python
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ```
 
 ### REST Framework
+
 ```python
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -225,6 +232,7 @@ if DEBUG:
 ```
 
 ### JWT Settings
+
 ```python
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=config('JWT_ACCESS_TOKEN_LIFETIME', default=60, cast=int)),
@@ -239,12 +247,14 @@ SIMPLE_JWT = {
 ```
 
 ### CORS Settings
+
 ```python
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='').split(',')
 CORS_ALLOW_CREDENTIALS = True
 ```
 
 ### DRF Spectacular (Swagger)
+
 ```python
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Lacrei Saúde API',
@@ -256,6 +266,7 @@ SPECTACULAR_SETTINGS = {
 ```
 
 ### Logging
+
 ```python
 LOGGING = {
     'version': 1,
@@ -311,13 +322,14 @@ os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 ```
 
 ### Security Settings (Production)
+
 ```python
 if not DEBUG:
     # HTTPS
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    
+
     # Security Headers
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -358,14 +370,14 @@ router = DefaultRouter()
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
-    
+
     # API v1
     path('api/v1/', include(router.urls)),
-    
+
     # Authentication
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
+
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -393,7 +405,7 @@ DJANGO_SETTINGS_MODULE = config.settings
 python_files = tests.py test_*.py *_tests.py
 python_classes = Test*
 python_functions = test_*
-addopts = 
+addopts =
     --cov=.
     --cov-report=html
     --cov-report=term-missing
@@ -486,7 +498,7 @@ exclude =
     .venv,
     env,
     ENV
-ignore = 
+ignore =
     E203,  # whitespace before ':'
     E266,  # too many leading '#' for block comment
     E501,  # line too long (handled by Black)

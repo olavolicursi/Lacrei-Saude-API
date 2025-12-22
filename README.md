@@ -38,38 +38,45 @@ API funcional, segura e pronta para produção, desenvolvida com foco em qualida
 ### Instalação Local
 
 1. **Clone o repositório:**
+
 ```bash
 git clone https://github.com/seu-usuario/Lacrei-Saude-API.git
 cd Lacrei-Saude-API
 ```
 
 2. **Instale o Poetry (se ainda não tiver):**
+
 ```bash
 pip install poetry
 ```
 
 3. **Instale as dependências:**
+
 ```bash
 poetry install
 ```
 
 4. **Configure as variáveis de ambiente:**
+
 ```bash
 cp .env.example .env
 # Edite o .env com suas configurações locais
 ```
 
 5. **Execute as migrações:**
+
 ```bash
 poetry run python manage.py migrate
 ```
 
 6. **Crie um superusuário:**
+
 ```bash
 poetry run python manage.py createsuperuser
 ```
 
 7. **Inicie o servidor:**
+
 ```bash
 poetry run python manage.py runserver
 ```
@@ -79,6 +86,7 @@ Acesse: http://localhost:8000
 ### 🐳 Instalação com Docker (Recomendado)
 
 1. **Clone e configure:**
+
 ```bash
 git clone https://github.com/seu-usuario/Lacrei-Saude-API.git
 cd Lacrei-Saude-API
@@ -86,11 +94,13 @@ cp .env.example .env
 ```
 
 2. **Inicie os containers:**
+
 ```bash
 docker-compose up --build
 ```
 
 3. **Acesse a aplicação:**
+
 - API: http://localhost:8000
 - Admin: http://localhost:8000/admin
 
@@ -105,6 +115,7 @@ A documentação interativa da API está disponível em:
 ### Endpoints Principais
 
 #### Profissionais
+
 ```
 GET    /api/v1/professionals/          # Listar profissionais
 POST   /api/v1/professionals/          # Criar profissional
@@ -115,6 +126,7 @@ DELETE /api/v1/professionals/{id}/     # Deletar profissional
 ```
 
 #### Consultas
+
 ```
 GET    /api/v1/appointments/                    # Listar consultas
 POST   /api/v1/appointments/                    # Criar consulta
@@ -125,6 +137,7 @@ GET    /api/v1/appointments/?professional_id=1  # Consultas por profissional
 ```
 
 #### Autenticação
+
 ```
 POST   /api/auth/token/          # Obter token JWT
 POST   /api/auth/token/refresh/  # Refresh token
@@ -146,21 +159,25 @@ curl -X GET http://localhost:8000/api/v1/professionals/ \
 ## 🧪 Executando Testes
 
 ### Todos os testes
+
 ```bash
 poetry run pytest
 ```
 
 ### Com relatório de cobertura
+
 ```bash
 poetry run pytest --cov
 ```
 
 ### Gerar relatório HTML de cobertura
+
 ```bash
 poetry run pytest --cov --cov-report=html
 ```
 
 ### Testes específicos
+
 ```bash
 poetry run pytest tests/test_professionals.py
 poetry run pytest tests/test_appointments.py
@@ -168,6 +185,7 @@ poetry run pytest tests/test_security.py
 ```
 
 ### Rodar testes no Docker
+
 ```bash
 docker-compose run --rm web pytest
 ```
@@ -278,6 +296,7 @@ O projeto possui um pipeline completo de CI/CD:
 ### Como fazer deploy
 
 1. **Para Staging:**
+
 ```bash
 git checkout develop
 git add .
@@ -286,6 +305,7 @@ git push origin develop
 ```
 
 2. **Para Production:**
+
 ```bash
 git checkout main
 git merge develop
@@ -297,6 +317,7 @@ git push origin main
 Em caso de problemas, consulte [docs/ROLLBACK.md](docs/ROLLBACK.md) para procedimentos de rollback.
 
 **Rollback rápido via GitHub Actions:**
+
 ```bash
 git revert HEAD
 git push origin main
@@ -350,6 +371,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## 👥 Autor
 
 **Seu Nome**
+
 - GitHub: [@seu-usuario](https://github.com/seu-usuario)
 - LinkedIn: [Seu Nome](https://linkedin.com/in/seu-perfil)
 - Email: seu.email@example.com

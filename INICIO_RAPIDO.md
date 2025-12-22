@@ -5,12 +5,14 @@
 ## 🎯 Primeiro Passo (5 minutos)
 
 ### 1. Instale o Poetry
+
 ```powershell
 # Windows PowerShell
 pip install poetry
 ```
 
 ### 2. Verifique a instalação
+
 ```powershell
 poetry --version
 ```
@@ -20,11 +22,13 @@ poetry --version
 ## 🚀 Setup Inicial (15 minutos)
 
 ### 1. Inicialize o projeto Poetry
+
 ```powershell
 poetry init
 ```
 
 **Responda as perguntas:**
+
 - Package name: `lacrei-saude-api`
 - Version: `0.1.0`
 - Description: `API RESTful de Gerenciamento de Consultas Médicas`
@@ -34,11 +38,13 @@ poetry init
 - Aceite dependências interativas: `no` (vamos adicionar manualmente)
 
 ### 2. Adicione as dependências principais
+
 ```powershell
 poetry add django djangorestframework psycopg2-binary python-decouple django-cors-headers djangorestframework-simplejwt gunicorn
 ```
 
 ### 3. Adicione as dependências de desenvolvimento
+
 ```powershell
 poetry add --group dev pytest pytest-django pytest-cov black flake8 isort
 ```
@@ -48,22 +54,26 @@ poetry add --group dev pytest pytest-django pytest-cov black flake8 isort
 ## 🏗️ Criar Estrutura Django (10 minutos)
 
 ### 1. Ative o ambiente virtual do Poetry
+
 ```powershell
 poetry shell
 ```
 
 ### 2. Crie o projeto Django
+
 ```powershell
 poetry run django-admin startproject config .
 ```
 
 ### 3. Crie os apps
+
 ```powershell
 poetry run python manage.py startapp professionals
 poetry run python manage.py startapp appointments
 ```
 
 ### 4. Crie diretórios adicionais
+
 ```powershell
 mkdir core
 mkdir tests
@@ -81,11 +91,13 @@ mkdir .github\workflows
 ### 1. Configure variáveis de ambiente
 
 **Copie o .env.example:**
+
 ```powershell
 Copy-Item .env.example .env
 ```
 
 **Edite o .env com suas configurações:**
+
 ```env
 DJANGO_SECRET_KEY=cole-aqui-uma-secret-key-gerada
 DEBUG=True
@@ -98,6 +110,7 @@ DB_PORT=5432
 ```
 
 **Gere uma SECRET_KEY:**
+
 ```powershell
 poetry run python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
@@ -105,12 +118,14 @@ poetry run python -c "from django.core.management.utils import get_random_secret
 ### 2. Atualize config/settings.py
 
 **Adicione no topo:**
+
 ```python
 from decouple import config
 import os
 ```
 
 **Substitua:**
+
 ```python
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -118,6 +133,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 ```
 
 **Adicione os apps:**
+
 ```python
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -126,12 +142,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
-    
+
     # Local apps
     'professionals',
     'appointments',
@@ -139,6 +155,7 @@ INSTALLED_APPS = [
 ```
 
 **Configure o banco de dados:**
+
 ```python
 DATABASES = {
     'default': {
@@ -159,9 +176,11 @@ DATABASES = {
 ### Opção A: PostgreSQL Local (Windows)
 
 **1. Baixe e instale:**
+
 - https://www.postgresql.org/download/windows/
 
 **2. Crie o database:**
+
 ```powershell
 # Abra o SQL Shell (psql)
 CREATE DATABASE lacrei_db;
@@ -175,8 +194,9 @@ GRANT ALL PRIVILEGES ON DATABASE lacrei_db TO lacrei_user;
 ### Opção B: Docker (Recomendado)
 
 **1. Crie docker-compose.yml temporário:**
+
 ```yaml
-version: '3.9'
+version: "3.9"
 
 services:
   db:
@@ -195,6 +215,7 @@ volumes:
 ```
 
 **2. Suba o PostgreSQL:**
+
 ```powershell
 docker-compose up -d db
 ```
@@ -204,21 +225,25 @@ docker-compose up -d db
 ## ✅ Primeiro Teste (5 minutos)
 
 ### 1. Execute as migrações iniciais
+
 ```powershell
 poetry run python manage.py migrate
 ```
 
 ### 2. Crie um superusuário
+
 ```powershell
 poetry run python manage.py createsuperuser
 ```
 
 ### 3. Inicie o servidor
+
 ```powershell
 poetry run python manage.py runserver
 ```
 
 ### 4. Acesse no navegador
+
 - API: http://localhost:8000
 - Admin: http://localhost:8000/admin
 
@@ -241,6 +266,7 @@ Agora que o ambiente está configurado, siga a ordem:
 ## 🆘 Problemas Comuns
 
 ### "poetry: command not found"
+
 ```powershell
 # Reinstale o Poetry
 pip install --user poetry
@@ -250,18 +276,21 @@ pip install --user poetry
 ```
 
 ### "psycopg2 installation error"
+
 ```powershell
 # Use psycopg2-binary em vez de psycopg2
 poetry add psycopg2-binary
 ```
 
 ### "FATAL: database 'lacrei_db' does not exist"
+
 ```powershell
 # Certifique-se de que criou o database
 # Ou use Docker (opção mais fácil)
 ```
 
 ### "Could not find .env file"
+
 ```powershell
 # Certifique-se de que copiou o .env.example
 Copy-Item .env.example .env

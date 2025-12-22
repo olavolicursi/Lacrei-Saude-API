@@ -3,6 +3,7 @@
 ## 📦 Poetry
 
 ### Clonar Projeto em Novo Computador
+
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/seu-usuario/Lacrei-Saude-API.git
@@ -32,6 +33,7 @@ poetry run python manage.py runserver
 ```
 
 ### Instalação e Configuração
+
 ```bash
 # Instalar Poetry
 pip install poetry
@@ -72,6 +74,7 @@ poetry run python manage.py comando
 ## 🎨 Linting e Formatação
 
 ### Black (Formatação)
+
 ```bash
 # Formatar todos os arquivos
 poetry run black .
@@ -84,6 +87,7 @@ poetry run black path/to/file.py
 ```
 
 ### Flake8 (Linting)
+
 ```bash
 # Verificar todo o projeto
 poetry run flake8 .
@@ -96,6 +100,7 @@ poetry run flake8 --max-line-length=100 .
 ```
 
 ### isort (Ordenação de imports)
+
 ```bash
 # Ordenar imports
 poetry run isort .
@@ -108,6 +113,7 @@ poetry run isort path/to/file.py
 ```
 
 ### Rodar todos de uma vez
+
 ```bash
 poetry run black . && poetry run flake8 . && poetry run isort .
 ```
@@ -115,6 +121,7 @@ poetry run black . && poetry run flake8 . && poetry run isort .
 ## 🗄️ Django
 
 ### Gerenciamento do Projeto
+
 ```bash
 # Criar projeto
 poetry run django-admin startproject config .
@@ -136,6 +143,7 @@ poetry run python manage.py shell_plus
 ```
 
 ### Migrations
+
 ```bash
 # Criar migrations
 poetry run python manage.py makemigrations
@@ -157,6 +165,7 @@ poetry run python manage.py migrate --fake app_name 0001
 ```
 
 ### Usuários
+
 ```bash
 # Criar superusuário
 poetry run python manage.py createsuperuser
@@ -166,6 +175,7 @@ poetry run python manage.py changepassword username
 ```
 
 ### Dados
+
 ```bash
 # Criar fixtures (backup de dados)
 poetry run python manage.py dumpdata > fixtures.json
@@ -181,6 +191,7 @@ poetry run python manage.py flush
 ```
 
 ### Arquivos Estáticos
+
 ```bash
 # Coletar arquivos estáticos
 poetry run python manage.py collectstatic
@@ -192,6 +203,7 @@ poetry run python manage.py collectstatic --noinput
 ## 🧪 Testes
 
 ### pytest
+
 ```bash
 # Rodar todos os testes
 poetry run pytest
@@ -232,6 +244,7 @@ poetry run pytest --durations=10
 ```
 
 ### Django Test Runner (alternativa)
+
 ```bash
 # Rodar todos os testes
 poetry run python manage.py test
@@ -246,6 +259,7 @@ poetry run python manage.py test professionals.tests.test_models.ProfessionalMod
 ## 🐳 Docker
 
 ### Build e Run
+
 ```bash
 # Build da imagem
 docker build -t lacrei-api .
@@ -270,6 +284,7 @@ docker-compose down -v
 ```
 
 ### Logs e Debug
+
 ```bash
 # Ver logs
 docker-compose logs
@@ -295,6 +310,7 @@ docker-compose exec db psql -U lacrei_user -d lacrei_db
 ```
 
 ### Limpeza
+
 ```bash
 # Remover containers parados
 docker container prune
@@ -312,6 +328,7 @@ docker volume prune
 ## 🗃️ PostgreSQL
 
 ### Conexão
+
 ```bash
 # Conectar via psql
 psql -h localhost -U lacrei_user -d lacrei_db
@@ -321,6 +338,7 @@ docker-compose exec db psql -U lacrei_user -d lacrei_db
 ```
 
 ### Comandos SQL Úteis
+
 ```sql
 -- Listar databases
 \l
@@ -345,6 +363,7 @@ docker-compose exec db psql -U lacrei_user -d lacrei_db
 ```
 
 ### Backup e Restore
+
 ```bash
 # Backup
 pg_dump -h localhost -U lacrei_user lacrei_db > backup.sql
@@ -368,6 +387,7 @@ gunzip -c backup.sql.gz | psql -h localhost -U lacrei_user lacrei_db
 ## 🚀 Git
 
 ### Workflow Básico
+
 ```bash
 # Status
 git status
@@ -400,6 +420,7 @@ git log --oneline --graph
 ```
 
 ### Correções
+
 ```bash
 # Desfazer último commit (mantém mudanças)
 git reset --soft HEAD~1
@@ -421,6 +442,7 @@ git clean -fd
 ## ☁️ AWS CLI
 
 ### ECS
+
 ```bash
 # Listar clusters
 aws ecs list-clusters
@@ -442,6 +464,7 @@ aws logs tail /ecs/service-name --follow
 ```
 
 ### RDS
+
 ```bash
 # Listar instâncias
 aws rds describe-db-instances
@@ -456,6 +479,7 @@ aws rds restore-db-instance-from-db-snapshot --db-instance-identifier new-instan
 ## 🔍 Debugging
 
 ### Django Debug Toolbar
+
 ```python
 # settings.py
 if DEBUG:
@@ -465,6 +489,7 @@ if DEBUG:
 ```
 
 ### IPython
+
 ```bash
 # Instalar
 poetry add --group dev ipython
@@ -474,6 +499,7 @@ import IPython; IPython.embed()
 ```
 
 ### Django Shell Plus
+
 ```bash
 # Instalar django-extensions
 poetry add --group dev django-extensions
@@ -491,6 +517,7 @@ poetry run python manage.py shell_plus --ipython
 ## 📊 Performance
 
 ### Profiling
+
 ```bash
 # Profile de código
 poetry add --group dev line_profiler
@@ -500,6 +527,7 @@ poetry add --group dev django-silk
 ```
 
 ### Query Optimization
+
 ```python
 # No shell
 from django.db import connection
@@ -518,11 +546,13 @@ reset_queries()
 ## 🔐 Segurança
 
 ### Gerar SECRET_KEY
+
 ```python
 python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
 
 ### Verificar segurança
+
 ```bash
 poetry run python manage.py check --deploy
 ```
@@ -530,11 +560,13 @@ poetry run python manage.py check --deploy
 ## 📝 Outras Utilidades
 
 ### Criar requirements.txt do Poetry
+
 ```bash
 poetry export -f requirements.txt --output requirements.txt --without-hashes
 ```
 
 ### Ver tamanho do projeto
+
 ```bash
 # Windows PowerShell
 Get-ChildItem -Recurse | Measure-Object -Property Length -Sum
@@ -544,6 +576,7 @@ du -sh .
 ```
 
 ### Contar linhas de código
+
 ```bash
 # Linux/macOS
 find . -name '*.py' | xargs wc -l

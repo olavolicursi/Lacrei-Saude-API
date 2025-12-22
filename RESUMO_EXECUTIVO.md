@@ -8,20 +8,21 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 
 ## ⏱️ Estimativas de Tempo
 
-| Fase | Descrição | Tempo Estimado | Prioridade |
-|------|-----------|----------------|------------|
-| 1 | Configuração do Ambiente | 2-4 horas | 🔴 ALTA |
-| 2 | Modelagem e Banco de Dados | 3-4 horas | 🔴 ALTA |
-| 3 | Implementação do CRUD | 6-8 horas | 🔴 ALTA |
-| 4 | Segurança e Validações | 4-6 horas | 🔴 CRÍTICA |
-| 5 | Testes Automatizados | 6-8 horas | 🔴 ALTA |
-| 6 | Docker e Containerização | 4-6 horas | 🔴 ALTA |
-| 7 | CI/CD com GitHub Actions | 4-6 horas | 🔴 ALTA |
-| 8 | Deploy AWS | 8-12 horas | 🔴 ALTA |
-| 9 | Documentação Completa | 4-6 horas | 🟡 MÉDIA |
-| 10 | Melhorias e Bônus | 6-8 horas | 🟢 BAIXA |
+| Fase | Descrição                  | Tempo Estimado | Prioridade |
+| ---- | -------------------------- | -------------- | ---------- |
+| 1    | Configuração do Ambiente   | 2-4 horas      | 🔴 ALTA    |
+| 2    | Modelagem e Banco de Dados | 3-4 horas      | 🔴 ALTA    |
+| 3    | Implementação do CRUD      | 6-8 horas      | 🔴 ALTA    |
+| 4    | Segurança e Validações     | 4-6 horas      | 🔴 CRÍTICA |
+| 5    | Testes Automatizados       | 6-8 horas      | 🔴 ALTA    |
+| 6    | Docker e Containerização   | 4-6 horas      | 🔴 ALTA    |
+| 7    | CI/CD com GitHub Actions   | 4-6 horas      | 🔴 ALTA    |
+| 8    | Deploy AWS                 | 8-12 horas     | 🔴 ALTA    |
+| 9    | Documentação Completa      | 4-6 horas      | 🟡 MÉDIA   |
+| 10   | Melhorias e Bônus          | 6-8 horas      | 🟢 BAIXA   |
 
 ### Totais
+
 - **MVP (Fases 1-8):** 35-50 horas (~1-2 semanas)
 - **Completo (com documentação):** 40-56 horas
 - **Full (com bônus):** 46-64 horas
@@ -31,17 +32,20 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 ## 🎨 Stack Tecnológica
 
 ### Backend
+
 - **Python** 3.11+
 - **Django** 5.0+
 - **Django REST Framework** 3.14+
 - **PostgreSQL** 15
 
 ### Segurança
+
 - **Simple JWT** - Autenticação
 - **django-cors-headers** - CORS
 - **python-decouple** - Variáveis de ambiente
 
 ### DevOps
+
 - **Poetry** - Gerenciamento de dependências
 - **Docker** + Docker Compose
 - **GitHub Actions** - CI/CD
@@ -50,6 +54,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - **AWS ALB** - Load Balancer
 
 ### Qualidade
+
 - **pytest** + pytest-django - Testes
 - **pytest-cov** - Cobertura
 - **Black** - Formatação
@@ -57,6 +62,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - **isort** - Imports
 
 ### Bônus
+
 - **drf-spectacular** - Documentação OpenAPI
 - **Redis** - Cache
 - **Sentry** - Monitoring
@@ -67,6 +73,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 ## ✅ Requisitos Obrigatórios
 
 ### Funcionalidades
+
 - [x] CRUD completo de profissionais da saúde
 - [x] CRUD completo de consultas médicas
 - [x] Busca de consultas por ID do profissional
@@ -74,6 +81,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - [x] Retornos em JSON
 
 ### Segurança
+
 - [x] Sanitização e validação de dados
 - [x] Proteção contra SQL Injection
 - [x] CORS configurado corretamente
@@ -81,6 +89,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - [x] Logs de acesso e erros
 
 ### Tecnologias
+
 - [x] Python + Django + DRF
 - [x] Poetry
 - [x] PostgreSQL
@@ -88,6 +97,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - [x] GitHub Actions
 
 ### Testes
+
 - [x] APITestCase do Django
 - [x] CRUD de consultas
 - [x] CRUD de profissionais
@@ -95,10 +105,12 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - [x] Cobertura mínima definida
 
 ### Deploy
+
 - [x] Ambientes separados: staging e produção
 - [x] AWS como plataforma
 
 ### CI/CD
+
 - [x] GitHub Actions
 - [x] Lint
 - [x] Testes
@@ -106,6 +118,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 - [x] Deploy
 
 ### Documentação
+
 - [x] README com setup local
 - [x] README com setup Docker
 - [x] Instruções de testes
@@ -130,24 +143,28 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 ### Semana 1 - Fundação (Dias 1-7)
 
 **Dia 1-2: Setup e Modelagem**
+
 - ✅ Configurar Poetry e dependências
 - ✅ Criar estrutura Django
 - ✅ Implementar models
 - ✅ Criar migrations
 
 **Dia 3-4: CRUD e API**
+
 - ✅ Implementar serializers
 - ✅ Implementar viewsets
 - ✅ Configurar URLs
 - ✅ Testar endpoints manualmente
 
 **Dia 5-6: Segurança**
+
 - ✅ Implementar JWT
 - ✅ Configurar CORS
 - ✅ Adicionar validações
 - ✅ Implementar logging
 
 **Dia 7: Testes**
+
 - ✅ Configurar pytest
 - ✅ Escrever testes unitários
 - ✅ Verificar cobertura
@@ -155,21 +172,25 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 ### Semana 2 - Deploy e Documentação (Dias 8-14)
 
 **Dia 8-9: Docker**
+
 - ✅ Criar Dockerfile
 - ✅ Criar docker-compose
 - ✅ Testar localmente
 
 **Dia 10-11: CI/CD**
+
 - ✅ Configurar GitHub Actions
 - ✅ Pipeline de testes
 - ✅ Pipeline de build
 
 **Dia 12-13: Deploy AWS**
+
 - ✅ Configurar infraestrutura
 - ✅ Deploy staging
 - ✅ Deploy production
 
 **Dia 14: Documentação**
+
 - ✅ Finalizar README
 - ✅ Documentação técnica
 - ✅ Swagger/ReDoc
@@ -179,6 +200,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 ## 📊 Estrutura de Dados
 
 ### Professional (Profissional)
+
 ```python
 {
     "id": 1,
@@ -201,6 +223,7 @@ Plano completo para desenvolvimento de uma API RESTful de Gerenciamento de Consu
 ```
 
 ### Appointment (Consulta)
+
 ```python
 {
     "id": 1,
@@ -256,6 +279,7 @@ ECS Cluster (Fargate)
 ```
 
 **Custos estimados (mínimo):**
+
 - ECS Fargate: ~$30-50/mês
 - RDS t3.micro: ~$15-20/mês
 - ALB: ~$20-25/mês
@@ -267,6 +291,7 @@ ECS Cluster (Fargate)
 ## 🎯 Critérios de Sucesso
 
 ### Técnicos
+
 ✅ Todos os testes passando (verde)
 ✅ Cobertura > 80%
 ✅ Lint sem erros
@@ -275,6 +300,7 @@ ECS Cluster (Fargate)
 ✅ Documentação completa
 
 ### Funcionais
+
 ✅ CRUD de profissionais operacional
 ✅ CRUD de consultas operacional
 ✅ Busca por profissional funcionando
@@ -282,6 +308,7 @@ ECS Cluster (Fargate)
 ✅ Validações impedindo dados inválidos
 
 ### Segurança
+
 ✅ Testes de segurança passando
 ✅ Nenhuma vulnerabilidade crítica
 ✅ Logs registrando acessos
@@ -305,6 +332,7 @@ ECS Cluster (Fargate)
 ## 🎓 Aprendizados Esperados
 
 ### Técnicos
+
 - Arquitetura de APIs RESTful
 - Autenticação JWT
 - Segurança em APIs
@@ -314,6 +342,7 @@ ECS Cluster (Fargate)
 - Containerização com Docker
 
 ### Soft Skills
+
 - Planejamento de projeto
 - Documentação técnica
 - Tomada de decisões arquiteturais

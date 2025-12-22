@@ -1,6 +1,7 @@
 # 📋 Plano de Implementação - API Lacrei Saúde
 
 ## 🎯 Visão Geral
+
 API RESTful de Gerenciamento de Consultas Médicas com foco em qualidade, segurança e boas práticas.
 
 ---
@@ -8,14 +9,17 @@ API RESTful de Gerenciamento de Consultas Médicas com foco em qualidade, segura
 ## 📅 Cronograma de Implementação
 
 ### **FASE 1: Configuração do Ambiente** (Prioridade: ALTA)
+
 **Tempo estimado: 2-4 horas**
 
 #### 1.1 Inicialização do projeto Python
+
 - [ ] Instalar Poetry: `pip install poetry`
 - [ ] Inicializar projeto: `poetry init`
-- [ ] Configurar Python 3.11+ no pyproject.toml
+- [ ] Configurar Python 3.13+ no pyproject.toml
 
 #### 1.2 Instalação de dependências base
+
 ```bash
 poetry add django djangorestframework
 poetry add psycopg2-binary python-decouple
@@ -25,6 +29,7 @@ poetry add --group dev black flake8 isort pylint
 ```
 
 #### 1.3 Criar projeto Django
+
 ```bash
 poetry run django-admin startproject config .
 poetry run python manage.py startapp professionals
@@ -32,6 +37,7 @@ poetry run python manage.py startapp appointments
 ```
 
 #### 1.4 Estrutura de pastas
+
 ```
 Lacrei-Saude-API/
 ├── config/                 # Configurações do Django
@@ -50,6 +56,7 @@ Lacrei-Saude-API/
 ```
 
 #### 1.5 Arquivos de configuração
+
 - [ ] Criar `.env.example` com variáveis necessárias
 - [ ] Configurar `.gitignore` adequado
 - [ ] Setup do `settings.py` com variáveis de ambiente
@@ -57,9 +64,11 @@ Lacrei-Saude-API/
 ---
 
 ### **FASE 2: Modelagem e Banco de Dados** (Prioridade: ALTA)
+
 **Tempo estimado: 3-4 horas**
 
 #### 2.1 Modelo de Profissionais
+
 ```python
 # professionals/models.py
 from django.db import models
@@ -72,11 +81,11 @@ class Professional(models.Model):
         ('NUTRICIONISTA', 'Nutricionista'),
         # ... outros
     ]
-    
+
     nome_social = models.CharField(max_length=200)
     profissao = models.CharField(max_length=50, choices=PROFESSION_CHOICES)
     registro_profissional = models.CharField(max_length=50, unique=True)
-    
+
     # Endereço
     cep = models.CharField(max_length=9)
     logradouro = models.CharField(max_length=200)
@@ -85,16 +94,16 @@ class Professional(models.Model):
     bairro = models.CharField(max_length=100)
     cidade = models.CharField(max_length=100)
     estado = models.CharField(max_length=2)
-    
+
     # Contato
     telefone = models.CharField(max_length=15)
     email = models.EmailField(unique=True)
-    
+
     # Metadados
     ativo = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         ordering = ['nome_social']
         indexes = [
@@ -104,6 +113,7 @@ class Professional(models.Model):
 ```
 
 #### 2.2 Modelo de Consultas
+
 ```python
 # appointments/models.py
 from django.db import models
@@ -116,7 +126,7 @@ class Appointment(models.Model):
         ('REALIZADA', 'Realizada'),
         ('CANCELADA', 'Cancelada'),
     ]
-    
+
     professional = models.ForeignKey(
         Professional,
         on_delete=models.PROTECT,
@@ -129,17 +139,17 @@ class Appointment(models.Model):
         choices=STATUS_CHOICES,
         default='AGENDADA'
     )
-    
+
     # Paciente (simplificado)
     paciente_nome = models.CharField(max_length=200)
     paciente_email = models.EmailField()
     paciente_telefone = models.CharField(max_length=15)
-    
+
     observacoes = models.TextField(blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         ordering = ['-data_hora']
         indexes = [
@@ -155,6 +165,7 @@ class Appointment(models.Model):
 ```
 
 #### 2.3 Migrations
+
 - [ ] `poetry run python manage.py makemigrations`
 - [ ] `poetry run python manage.py migrate`
 - [ ] Criar dados de teste (fixtures ou script)
@@ -162,9 +173,11 @@ class Appointment(models.Model):
 ---
 
 ### **FASE 3: Implementação do CRUD** (Prioridade: ALTA)
+
 **Tempo estimado: 6-8 horas**
 
 #### 3.1 Serializers
+
 ```python
 # professionals/serializers.py
 from rest_framework import serializers
@@ -175,11 +188,11 @@ class ProfessionalSerializer(serializers.ModelSerializer):
         model = Professional
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at')
-    
+
     def validate_email(self, value):
         # Validação customizada
         return value.lower()
-    
+
     def validate_telefone(self, value):
         # Remover caracteres especiais e validar
         import re
@@ -190,6 +203,7 @@ class ProfessionalSerializer(serializers.ModelSerializer):
 ```
 
 #### 3.2 ViewSets
+
 ```python
 # professionals/views.py
 from rest_framework import viewsets, filters
@@ -208,6 +222,7 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
 ```
 
 #### 3.3 URLs
+
 ```python
 # config/urls.py
 from django.urls import path, include
@@ -226,6 +241,7 @@ urlpatterns = [
 ```
 
 #### 3.4 Endpoints a implementar
+
 - `GET /api/v1/professionals/` - Listar profissionais
 - `POST /api/v1/professionals/` - Criar profissional
 - `GET /api/v1/professionals/{id}/` - Detalhar profissional
@@ -240,9 +256,11 @@ urlpatterns = [
 ---
 
 ### **FASE 4: Segurança e Validações** (Prioridade: CRÍTICA)
+
 **Tempo estimado: 4-6 horas**
 
 #### 4.1 Autenticação JWT
+
 ```python
 # config/settings.py
 INSTALLED_APPS += ['rest_framework_simplejwt']
@@ -266,6 +284,7 @@ REST_FRAMEWORK = {
 ```
 
 #### 4.2 CORS
+
 ```python
 INSTALLED_APPS += ['corsheaders']
 
@@ -289,6 +308,7 @@ if ENV == 'production':
 ```
 
 #### 4.3 Sanitização de inputs
+
 ```python
 # core/validators.py
 import bleach
@@ -312,6 +332,7 @@ def validate_no_sql_injection(value):
 ```
 
 #### 4.4 Logging
+
 ```python
 # config/settings.py
 LOGGING = {
@@ -355,6 +376,7 @@ LOGGING = {
 ```
 
 #### 4.5 Middleware de segurança customizado
+
 ```python
 # core/middleware.py
 import logging
@@ -372,16 +394,17 @@ class SecurityLoggingMiddleware:
                 f"Suspicious request from {request.META.get('REMOTE_ADDR')}: "
                 f"{request.path}"
             )
-        
+
         response = self.get_response(request)
         return response
-    
+
     def _is_suspicious(self, request):
         # Implementar lógica de detecção
         return False
 ```
 
 #### 4.6 Configurações de segurança Django
+
 ```python
 # Security settings
 SECURE_SSL_REDIRECT = True  # Produção
@@ -400,9 +423,11 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 ---
 
 ### **FASE 5: Testes Automatizados** (Prioridade: ALTA)
+
 **Tempo estimado: 6-8 horas**
 
 #### 5.1 Configuração de testes
+
 ```python
 # pytest.ini
 [pytest]
@@ -440,6 +465,7 @@ def sample_professional(db):
 ```
 
 #### 5.2 Testes de Profissionais
+
 ```python
 # tests/test_professionals.py
 import pytest
@@ -448,11 +474,11 @@ from professionals.models import Professional
 
 @pytest.mark.django_db
 class TestProfessionalCRUD:
-    
+
     def test_list_professionals(self, authenticated_client):
         response = authenticated_client.get('/api/v1/professionals/')
         assert response.status_code == status.HTTP_200_OK
-    
+
     def test_create_professional(self, authenticated_client):
         data = {
             'nome_social': 'Dra. Maria Santos',
@@ -461,12 +487,12 @@ class TestProfessionalCRUD:
             # ... outros campos obrigatórios
         }
         response = authenticated_client.post(
-            '/api/v1/professionals/', 
+            '/api/v1/professionals/',
             data
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert Professional.objects.count() == 1
-    
+
     def test_create_professional_invalid_email(self, authenticated_client):
         data = {
             'nome_social': 'Dr. João',
@@ -474,14 +500,14 @@ class TestProfessionalCRUD:
             # ...
         }
         response = authenticated_client.post(
-            '/api/v1/professionals/', 
+            '/api/v1/professionals/',
             data
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-    
+
     def test_update_professional(
-        self, 
-        authenticated_client, 
+        self,
+        authenticated_client,
         sample_professional
     ):
         data = {'nome_social': 'Dr. João Silva Junior'}
@@ -492,10 +518,10 @@ class TestProfessionalCRUD:
         assert response.status_code == status.HTTP_200_OK
         sample_professional.refresh_from_db()
         assert sample_professional.nome_social == data['nome_social']
-    
+
     def test_delete_professional(
-        self, 
-        authenticated_client, 
+        self,
+        authenticated_client,
         sample_professional
     ):
         response = authenticated_client.delete(
@@ -505,6 +531,7 @@ class TestProfessionalCRUD:
 ```
 
 #### 5.3 Testes de Consultas
+
 ```python
 # tests/test_appointments.py
 import pytest
@@ -513,10 +540,10 @@ from rest_framework import status
 
 @pytest.mark.django_db
 class TestAppointmentCRUD:
-    
+
     def test_create_appointment(
-        self, 
-        authenticated_client, 
+        self,
+        authenticated_client,
         sample_professional
     ):
         future_date = datetime.now() + timedelta(days=7)
@@ -528,11 +555,11 @@ class TestAppointmentCRUD:
             'paciente_telefone': '11999999999',
         }
         response = authenticated_client.post(
-            '/api/v1/appointments/', 
+            '/api/v1/appointments/',
             data
         )
         assert response.status_code == status.HTTP_201_CREATED
-    
+
     def test_list_appointments_by_professional(
         self,
         authenticated_client,
@@ -540,7 +567,7 @@ class TestAppointmentCRUD:
     ):
         # Criar algumas consultas
         # ...
-        
+
         response = authenticated_client.get(
             f'/api/v1/appointments/?professional_id={sample_professional.id}'
         )
@@ -549,6 +576,7 @@ class TestAppointmentCRUD:
 ```
 
 #### 5.4 Testes de Segurança
+
 ```python
 # tests/test_security.py
 import pytest
@@ -556,11 +584,11 @@ from rest_framework import status
 
 @pytest.mark.django_db
 class TestSecurity:
-    
+
     def test_unauthenticated_request(self, api_client):
         response = api_client.get('/api/v1/professionals/')
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-    
+
     def test_sql_injection_prevention(self, authenticated_client):
         malicious_data = {
             'nome_social': "'; DROP TABLE professionals; --",
@@ -573,7 +601,7 @@ class TestSecurity:
         )
         # Deve falhar na validação ou ser sanitizado
         # Verificar que a tabela ainda existe
-    
+
     def test_xss_prevention(self, authenticated_client):
         xss_data = {
             'nome_social': '<script>alert("XSS")</script>',
@@ -590,6 +618,7 @@ class TestSecurity:
 ```
 
 #### 5.5 Cobertura de testes
+
 - [ ] Meta: mínimo 80% de cobertura
 - [ ] Executar: `poetry run pytest --cov`
 - [ ] Gerar relatório HTML: `poetry run pytest --cov --cov-report=html`
@@ -597,9 +626,11 @@ class TestSecurity:
 ---
 
 ### **FASE 6: Docker e Containerização** (Prioridade: ALTA)
+
 **Tempo estimado: 4-6 horas**
 
 #### 6.1 Dockerfile
+
 ```dockerfile
 # Dockerfile
 FROM python:3.11-slim
@@ -648,8 +679,9 @@ CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers
 ```
 
 #### 6.2 docker-compose.yml
+
 ```yaml
-version: '3.9'
+version: "3.9"
 
 services:
   db:
@@ -706,6 +738,7 @@ volumes:
 ```
 
 #### 6.3 Entrypoint script
+
 ```bash
 #!/bin/bash
 # docker/entrypoint.sh
@@ -733,6 +766,7 @@ exec "$@"
 ```
 
 #### 6.4 Nginx configuration
+
 ```nginx
 # docker/nginx.conf
 upstream django {
@@ -764,9 +798,11 @@ server {
 ---
 
 ### **FASE 7: CI/CD com GitHub Actions** (Prioridade: ALTA)
+
 **Tempo estimado: 4-6 horas**
 
 #### 7.1 Workflow principal
+
 ```yaml
 # .github/workflows/ci-cd.yml
 name: CI/CD Pipeline
@@ -778,8 +814,8 @@ on:
     branches: [main, develop]
 
 env:
-  PYTHON_VERSION: '3.11'
-  POETRY_VERSION: '1.7.1'
+  PYTHON_VERSION: "3.11"
+  POETRY_VERSION: "1.7.1"
 
 jobs:
   lint:
@@ -787,26 +823,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      
+
       - name: Install Poetry
         run: |
           pip install poetry==${{ env.POETRY_VERSION }}
           poetry config virtualenvs.create false
-      
+
       - name: Install dependencies
         run: poetry install
-      
+
       - name: Run Black
         run: poetry run black --check .
-      
+
       - name: Run Flake8
         run: poetry run flake8 .
-      
+
       - name: Run isort
         run: poetry run isort --check-only .
 
@@ -814,7 +850,7 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     needs: lint
-    
+
     services:
       postgres:
         image: postgres:15
@@ -829,20 +865,20 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      
+
       - name: Install dependencies
         run: |
           pip install poetry==${{ env.POETRY_VERSION }}
           poetry install
-      
+
       - name: Run migrations
         env:
           DB_HOST: localhost
@@ -851,7 +887,7 @@ jobs:
           DB_USER: test_user
           DB_PASSWORD: test_pass
         run: poetry run python manage.py migrate
-      
+
       - name: Run tests with coverage
         env:
           DB_HOST: localhost
@@ -860,7 +896,7 @@ jobs:
           DB_USER: test_user
           DB_PASSWORD: test_pass
         run: poetry run pytest --cov --cov-report=xml
-      
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
@@ -871,19 +907,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'push'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -903,17 +939,17 @@ jobs:
     environment:
       name: staging
       url: https://staging-api.lacrei.com
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      
+
       - name: Deploy to ECS
         run: |
           # Script de deploy para staging
@@ -927,22 +963,22 @@ jobs:
     environment:
       name: production
       url: https://api.lacrei.com
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      
+
       - name: Deploy to ECS
         run: |
           # Script de deploy para produção
           ./scripts/deploy-ecs.sh production
-      
+
       - name: Run smoke tests
         run: |
           # Verificar se a aplicação está funcionando
@@ -950,6 +986,7 @@ jobs:
 ```
 
 #### 7.2 Secrets necessários no GitHub
+
 - `DOCKER_USERNAME`
 - `DOCKER_PASSWORD`
 - `AWS_ACCESS_KEY_ID`
@@ -960,9 +997,11 @@ jobs:
 ---
 
 ### **FASE 8: Deploy AWS (Staging/Produção)** (Prioridade: ALTA)
+
 **Tempo estimado: 8-12 horas**
 
 #### 8.1 Arquitetura AWS proposta
+
 ```
 Internet → Route53 → CloudFront → ALB → ECS/Fargate → RDS PostgreSQL
                                                     ↓
@@ -974,47 +1013,55 @@ Internet → Route53 → CloudFront → ALB → ECS/Fargate → RDS PostgreSQL
 #### 8.2 Recursos AWS necessários
 
 **VPC e Rede:**
+
 - VPC com subnets públicas e privadas
 - Internet Gateway
 - NAT Gateway
 - Security Groups configurados
 
 **Compute:**
+
 - ECS Cluster
 - Task Definitions (staging e production)
 - Fargate para execução dos containers
 - Auto Scaling configurado
 
 **Database:**
+
 - RDS PostgreSQL (Multi-AZ para produção)
 - Parameter Group otimizado
 - Automated backups
 - Encryption at rest
 
 **Load Balancing:**
+
 - Application Load Balancer
 - Target Groups
 - Health checks configurados
 
 **Storage:**
+
 - S3 bucket para arquivos estáticos
 - S3 bucket para media files
 - CloudFront para CDN
 
 **Cache (opcional):**
+
 - ElastiCache Redis para sessões e cache
 
 **Monitoring:**
+
 - CloudWatch Logs
 - CloudWatch Alarms
 - X-Ray para tracing
 
 #### 8.3 Terraform/IaC (Recomendado)
+
 ```hcl
 # terraform/main.tf - exemplo básico
 terraform {
   required_version = ">= 1.0"
-  
+
   backend "s3" {
     bucket = "lacrei-terraform-state"
     key    = "api/terraform.tfstate"
@@ -1028,14 +1075,14 @@ provider "aws" {
 
 module "vpc" {
   source = "./modules/vpc"
-  
+
   environment = var.environment
   cidr_block  = var.vpc_cidr
 }
 
 module "rds" {
   source = "./modules/rds"
-  
+
   environment      = var.environment
   vpc_id          = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
@@ -1044,7 +1091,7 @@ module "rds" {
 
 module "ecs" {
   source = "./modules/ecs"
-  
+
   environment     = var.environment
   vpc_id         = module.vpc.vpc_id
   public_subnets = module.vpc.public_subnets
@@ -1054,6 +1101,7 @@ module "ecs" {
 ```
 
 #### 8.4 Scripts de deploy
+
 ```bash
 # scripts/deploy-ecs.sh
 #!/bin/bash
@@ -1113,6 +1161,7 @@ echo "Deploy completed successfully!"
 #### 8.5 Variáveis de ambiente por ambiente
 
 **Staging:**
+
 ```env
 ENVIRONMENT=staging
 DEBUG=False
@@ -1122,6 +1171,7 @@ CORS_ALLOWED_ORIGINS=https://staging.lacrei.com
 ```
 
 **Production:**
+
 ```env
 ENVIRONMENT=production
 DEBUG=False
@@ -1133,10 +1183,12 @@ CORS_ALLOWED_ORIGINS=https://lacrei.com,https://www.lacrei.com
 ---
 
 ### **FASE 9: Documentação Completa** (Prioridade: MÉDIA)
+
 **Tempo estimado: 4-6 horas**
 
 #### 9.1 README.md principal
-```markdown
+
+````markdown
 # 🏥 Lacrei Saúde API
 
 API RESTful para gerenciamento de consultas médicas com foco em segurança e qualidade.
@@ -1144,6 +1196,7 @@ API RESTful para gerenciamento de consultas médicas com foco em segurança e qu
 ## 🚀 Quick Start
 
 ### Pré-requisitos
+
 - Python 3.11+
 - Poetry
 - Docker & Docker Compose
@@ -1152,28 +1205,34 @@ API RESTful para gerenciamento de consultas médicas com foco em segurança e qu
 ### Setup Local
 
 1. Clone o repositório:
+
 ```bash
 git clone https://github.com/seu-usuario/Lacrei-Saude-API.git
 cd Lacrei-Saude-API
 ```
+````
 
 2. Instale as dependências:
+
 ```bash
 poetry install
 ```
 
 3. Configure variáveis de ambiente:
+
 ```bash
 cp .env.example .env
 # Edite o .env com suas configurações
 ```
 
 4. Execute as migrações:
+
 ```bash
 poetry run python manage.py migrate
 ```
 
 5. Inicie o servidor:
+
 ```bash
 poetry run python manage.py runserver
 ```
@@ -1189,6 +1248,7 @@ Acesse: http://localhost:8000
 ## 📚 Documentação da API
 
 Documentação interativa disponível em:
+
 - Swagger UI: http://localhost:8000/api/docs/
 - ReDoc: http://localhost:8000/api/redoc/
 
@@ -1223,6 +1283,7 @@ poetry run pytest tests/test_professionals.py
 ### CI/CD Pipeline
 
 O projeto usa GitHub Actions com os seguintes stages:
+
 1. Lint (Black, Flake8, isort)
 2. Tests (pytest com cobertura)
 3. Build (Docker image)
@@ -1245,7 +1306,8 @@ O projeto usa GitHub Actions com os seguintes stages:
 ## 📄 Licença
 
 MIT
-```
+
+````
 
 #### 9.2 Documentação API (Swagger/OpenAPI)
 ```python
@@ -1278,54 +1340,67 @@ urlpatterns += [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema')),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema')),
 ]
-```
+````
 
 #### 9.3 Documentação de Decisões Técnicas
+
 ```markdown
 # docs/DECISOES_TECNICAS.md
 
 ## Escolhas de Tecnologia
 
 ### Django + Django REST Framework
+
 **Decisão:** Framework principal
 **Justificativa:**
+
 - ORM robusto com proteção contra SQL Injection
 - Admin panel built-in para gestão
 - Ecossistema maduro e bem documentado
 - DRF oferece serializers, viewsets e autenticação pronta
 
 ### Poetry
+
 **Decisão:** Gerenciador de dependências
 **Justificativa:**
+
 - Resolução de dependências determinística
 - Separação clara entre dev/prod
 - Melhor que pip + requirements.txt
 
 ### PostgreSQL
+
 **Decisão:** Banco de dados
 **Justificativa:**
+
 - ACID compliance
 - Melhor para dados relacionais
 - Suporte a índices avançados
 - Maturidade e performance
 
 ### JWT para autenticação
+
 **Decisão:** Simple JWT
 **Justificativa:**
+
 - Stateless authentication
 - Escalável horizontalmente
 - Tokens com expiração configurável
 
 ### Docker
+
 **Decisão:** Containerização
 **Justificativa:**
+
 - Ambiente consistente dev/staging/prod
 - Facilita deploy e scaling
 - Integração com orquestradores
 
 ### AWS ECS
+
 **Decisão:** Plataforma de deploy
 **Justificativa:**
+
 - Gerenciamento simplificado de containers
 - Auto-scaling nativo
 - Integração com outros serviços AWS
@@ -1333,16 +1408,19 @@ urlpatterns += [
 ```
 
 #### 9.4 Diário de Desenvolvimento
+
 ```markdown
 # docs/DIARIO.md
 
 ## Dia 1 - Setup inicial
+
 - ✅ Configuração do Poetry
 - ✅ Estrutura de pastas
 - ⚠️ Problema: Conflito de versão do psycopg2
   - Solução: Usar psycopg2-binary
 
 ## Dia 2 - Modelagem
+
 - ✅ Models de Professional e Appointment
 - ✅ Migrations iniciais
 - 💡 Decisão: Adicionar soft delete
@@ -1353,11 +1431,13 @@ urlpatterns += [
 ---
 
 ### **FASE 10: Melhorias e Bônus** (Prioridade: BAIXA)
+
 **Tempo estimado: 6-8 horas**
 
 #### 10.1 Integração com Asaas (Split de Pagamento)
 
 **Proposta de Arquitetura:**
+
 ```
 Consulta Criada → Event → Payment Service → Asaas API
                                          ↓
@@ -1367,6 +1447,7 @@ Consulta Criada → Event → Payment Service → Asaas API
 ```
 
 **Implementação Mock:**
+
 ```python
 # payments/services.py
 import requests
@@ -1374,16 +1455,16 @@ from decimal import Decimal
 
 class AsaasPaymentService:
     BASE_URL = "https://sandbox.asaas.com/api/v3"
-    
+
     def __init__(self, api_key):
         self.api_key = api_key
         self.headers = {
             "access_token": api_key,
             "Content-Type": "application/json"
         }
-    
+
     def create_payment_with_split(
-        self, 
+        self,
         appointment_id,
         total_value,
         professional_wallet_id
@@ -1393,7 +1474,7 @@ class AsaasPaymentService:
         """
         platform_fee = total_value * Decimal('0.20')
         professional_amount = total_value - platform_fee
-        
+
         payload = {
             "customer": appointment.paciente_email,
             "billingType": "CREDIT_CARD",
@@ -1407,15 +1488,15 @@ class AsaasPaymentService:
                 }
             ]
         }
-        
+
         response = requests.post(
             f"{self.BASE_URL}/payments",
             json=payload,
             headers=self.headers
         )
-        
+
         return response.json()
-    
+
     def create_subaccount(self, professional):
         """
         Cria subconta para o profissional
@@ -1427,17 +1508,18 @@ class AsaasPaymentService:
             "phone": professional.telefone,
             # ... outros dados
         }
-        
+
         response = requests.post(
             f"{self.BASE_URL}/accounts",
             json=payload,
             headers=self.headers
         )
-        
+
         return response.json()
 ```
 
 **Webhook Handler:**
+
 ```python
 # payments/views.py
 from rest_framework.decorators import api_view
@@ -1451,10 +1533,10 @@ def asaas_webhook(request):
     signature = request.headers.get('asaas-signature')
     if not validate_webhook_signature(request.body, signature):
         return Response({'error': 'Invalid signature'}, status=401)
-    
+
     event = request.data.get('event')
     payment_data = request.data.get('payment')
-    
+
     if event == 'PAYMENT_CONFIRMED':
         # Atualizar status da consulta
         appointment = Appointment.objects.get(
@@ -1462,16 +1544,17 @@ def asaas_webhook(request):
         )
         appointment.status = 'CONFIRMADA'
         appointment.save()
-        
+
         # Enviar notificações
         send_confirmation_email(appointment)
-    
+
     return Response({'status': 'processed'})
 ```
 
 #### 10.2 Melhorias de Performance
 
 **Cache com Redis:**
+
 ```python
 # config/settings.py
 CACHES = {
@@ -1495,6 +1578,7 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
 ```
 
 **Database Optimization:**
+
 ```python
 # Usar select_related e prefetch_related
 class AppointmentViewSet(viewsets.ModelViewSet):
@@ -1509,6 +1593,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 #### 10.3 Monitoramento Avançado
 
 **Sentry para Error Tracking:**
+
 ```python
 # config/settings.py
 import sentry_sdk
@@ -1524,6 +1609,7 @@ sentry_sdk.init(
 ```
 
 **Prometheus Metrics:**
+
 ```python
 # requirements
 django-prometheus
@@ -1546,7 +1632,8 @@ urlpatterns += [
 #### 10.4 Rollback Strategy
 
 **Estratégia Blue-Green Deploy:**
-```markdown
+
+````markdown
 # docs/ROLLBACK.md
 
 ## Estratégia de Rollback
@@ -1554,11 +1641,13 @@ urlpatterns += [
 ### Blue-Green Deployment
 
 **Setup:**
+
 - Dois ambientes idênticos (Blue e Green)
 - ALB com Target Groups para cada ambiente
 - Route53 para switch de DNS
 
 **Processo de Deploy:**
+
 1. Produção ativa em Blue
 2. Deploy nova versão em Green
 3. Executar smoke tests em Green
@@ -1566,11 +1655,13 @@ urlpatterns += [
 5. Blue fica em standby por 24h
 
 **Rollback:**
+
 - Se problema detectado: Switch ALB de volta para Blue
 - Tempo de rollback: < 5 minutos
 - Zero downtime
 
 **Comandos:**
+
 ```bash
 # Deploy to Green
 ./scripts/deploy-blue-green.sh green
@@ -1584,10 +1675,12 @@ urlpatterns += [
 # Rollback se necessário
 ./scripts/switch-traffic.sh blue
 ```
+````
 
 ### Alternativa: Revert no GitHub Actions
 
 **Processo:**
+
 1. Identificar commit problemático
 2. Revert no Git:
    ```bash
@@ -1599,6 +1692,7 @@ urlpatterns += [
 ### Database Migrations Rollback
 
 **Cuidados:**
+
 - Sempre fazer backup antes de migrations
 - Migrations devem ser reversíveis
 - Testar rollback em staging primeiro
@@ -1613,6 +1707,7 @@ python manage.py migrate app_name 0001_previous_migration
 # Restaurar backup se necessário
 psql -h $DB_HOST -U $DB_USER $DB_NAME < backup.sql
 ```
+
 ```
 
 ---
@@ -1669,3 +1764,4 @@ psql -h $DB_HOST -U $DB_USER $DB_NAME < backup.sql
 ---
 
 **Boa sorte com o desafio! 🚀**
+```
