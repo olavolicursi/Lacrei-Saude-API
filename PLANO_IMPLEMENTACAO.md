@@ -57,9 +57,9 @@ Lacrei-Saude-API/
 
 #### 1.5 Arquivos de configuração
 
-- [ ] Criar `.env.example` com variáveis necessárias
-- [ ] Configurar `.gitignore` adequado
-- [ ] Setup do `settings.py` com variáveis de ambiente
+- [x] Criar `.env.example` com variáveis necessárias
+- [x] Configurar `.gitignore` adequado
+- [x] Setup do `settings.py` com variáveis de ambiente
 
 ---
 
@@ -166,9 +166,9 @@ class Appointment(models.Model):
 
 #### 2.3 Migrations
 
-- [ ] `poetry run python manage.py makemigrations`
-- [ ] `poetry run python manage.py migrate`
-- [ ] Criar dados de teste (fixtures ou script)
+- [x] `poetry run python manage.py makemigrations`
+- [x] `poetry run python manage.py migrate`
+- [x] Criar dados de teste (fixtures ou script)
 
 ---
 
