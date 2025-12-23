@@ -363,3 +363,163 @@ LOGGING = {
     },
 }
 
+
+# ==============================================================================
+# SECURITY SETTINGS
+# ==============================================================================
+
+# Obter o ambiente (development, staging, production)
+ENVIRONMENT = config('ENVIRONMENT', default='development')
+
+# Secret Key (já configurado acima, mas reforçando importância)
+if not SECRET_KEY or SECRET_KEY == 'django-insecure-change-this-in-production':
+    import warnings
+    warnings.warn(
+        "DJANGO_SECRET_KEY não está configurado ou usando valor padrão inseguro! "
+        "Configure no arquivo .env",
+        RuntimeWarning
+    )
+
+# Debug Mode - NUNCA use True em produção
+if ENVIRONMENT == 'production' and DEBUG:
+    raise ValueError("DEBUG não pode ser True em ambiente de produção!")
+
+# Allowed Hosts - Configuração por ambiente
+if ENVIRONMENT == 'production':
+    if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
+        raise ValueError("ALLOWED_HOSTS deve ser configurado em produção!")
+elif ENVIRONMENT == 'development':
+    if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+
+# ==============================================================================
+# HTTPS/SSL Settings (Produção)
+# ==============================================================================
+
+if ENVIRONMENT == 'production':
+    # Redirecionar todo tráfego HTTP para HTTPS
+    SECURE_SSL_REDIRECT = True
+    
+    # Tempo que o navegador deve lembrar que o site só pode ser acessado via HTTPS (1 ano)
+    SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Proxy SSL headers (para uso com load balancers como ALB, nginx)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    # Desenvolvimento/Staging - SSL opcional
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+
+# ==============================================================================
+# Cookie Security Settings
+# ==============================================================================
+
+# Session Cookie - Apenas via HTTPS em produção
+SESSION_COOKIE_SECURE = ENVIRONMENT == 'production'
+SESSION_COOKIE_HTTPONLY = True  # Previne acesso via JavaScript
+SESSION_COOKIE_SAMESITE = 'Lax'  # Proteção contra CSRF
+SESSION_COOKIE_AGE = 86400  # 24 horas
+
+# CSRF Cookie - Apenas via HTTPS em produção
+CSRF_COOKIE_SECURE = ENVIRONMENT == 'production'
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Cookie name customizado (dificulta identificação do framework)
+SESSION_COOKIE_NAME = 'lacrei_sessionid'
+CSRF_COOKIE_NAME = 'lacrei_csrftoken'
+
+# ==============================================================================
+# Browser Security Headers
+# ==============================================================================
+
+# Previne que o navegador "adivinhe" o content-type
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Habilita proteção XSS do navegador
+SECURE_BROWSER_XSS_FILTER = True
+
+# Previne que o site seja carregado em frames/iframes (proteção contra clickjacking)
+X_FRAME_OPTIONS = 'DENY'
+
+# Content Security Policy - Política de segurança de conteúdo
+# Desabilitado por padrão, mas recomendado configurar conforme necessidade do frontend
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'")  # Ajuste conforme necessário
+# CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+# CSP_IMG_SRC = ("'self'", "data:", "https:")
+# CSP_FONT_SRC = ("'self'", "data:")
+
+# ==============================================================================
+# Password Validation Settings
+# ==============================================================================
+
+# Validators já configurados anteriormente, mas garantindo boas práticas
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+# ==============================================================================
+# Additional Security Settings
+# ==============================================================================
+
+# Previne que informações sensíveis sejam expostas em páginas de erro
+if ENVIRONMENT == 'production':
+    ADMINS = [
+        ('Admin Team', config('ADMIN_EMAIL', default='admin@lacrei.com')),
+    ]
+    MANAGERS = ADMINS
+
+# Previne ataques de host header
+USE_X_FORWARDED_HOST = False
+
+# Data upload limits
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
+
+# Security middleware já está configurado em MIDDLEWARE
+
+# ==============================================================================
+# API Security Settings (complementando REST_FRAMEWORK)
+# ==============================================================================
+
+# Timeout para requisições
+# (Configurar no servidor web/proxy reverso também)
+
+# IP do servidor para logs
+INTERNAL_IPS = config('INTERNAL_IPS', default='127.0.0.1').split(',')
+
+# ==============================================================================
+# Configurações de Email Seguras (para notificações de erro)
+# ==============================================================================
+
+if ENVIRONMENT == 'production':
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@lacrei.com')
+    SERVER_EMAIL = config('SERVER_EMAIL', default='server@lacrei.com')
+else:
+    # Desenvolvimento - Console backend (imprime emails no console)
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
