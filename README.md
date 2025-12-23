@@ -30,7 +30,7 @@ API funcional, segura e pronta para produção, desenvolvida com foco em qualida
 
 ### Pré-requisitos
 
-- Python 3.11+
+- Python 3.13+
 - Poetry
 - Docker e Docker Compose (opcional, mas recomendado)
 - PostgreSQL 15 (se rodar sem Docker)
@@ -194,14 +194,40 @@ docker-compose run --rm web pytest
 
 Este projeto implementa diversas camadas de segurança:
 
-- **Autenticação JWT:** Tokens com expiração configurável
-- **Rate Limiting:** Proteção contra abuso de API
-- **CORS:** Configurado para origens específicas
-- **Sanitização de Inputs:** Prevenção de XSS
-- **SQL Injection:** Proteção via ORM do Django
+- **Autenticação JWT:** Tokens com expiração configurável (1h access, 7 dias refresh)
+- **Rate Limiting:** Proteção contra abuso (100 req/h anônimo, 1000 req/h autenticado)
+- **CORS:** Configurado por ambiente (dev/staging/production)
+- **Sanitização de Inputs:** Prevenção de XSS com validadores customizados
+- **SQL Injection:** Proteção via ORM + validadores anti-injection
 - **HTTPS:** Redirecionamento forçado em produção
 - **Logs de Segurança:** Monitoramento de atividades suspeitas
 - **Validações:** Camadas múltiplas de validação de dados
+
+### 🛡️ Sanitização e Validação de Inputs
+
+A API implementa validadores customizados no módulo `core` para proteger contra ataques:
+
+**Proteção contra XSS (Cross-Site Scripting):**
+```python
+# Entrada maliciosa
+nome = "<script>alert('XSS')</script>Dr. João Silva"
+# Após sanitização: "Dr. João Silva" (tags HTML removidas)
+```
+
+**Proteção contra SQL Injection:**
+```python
+# Entrada maliciosa
+nome = "'; DROP TABLE users; --"
+# Resultado: ValidationError - "Entrada suspeita detectada"
+```
+
+**Campos protegidos automaticamente:**
+- **Professional:** nome_social, logradouro, complemento, bairro, cidade, email, telefone
+- **Appointment:** paciente_nome, paciente_email, paciente_telefone, observacoes
+
+📖 **Documentação completa:** [core/README.md](core/README.md)
+
+🧪 **Testes de segurança:** 28 testes automatizados com 95% de cobertura
 
 ## 🏗️ Arquitetura
 

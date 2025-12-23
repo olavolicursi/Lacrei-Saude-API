@@ -633,7 +633,7 @@ class TestSecurity:
 
 ```dockerfile
 # Dockerfile
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Variáveis de ambiente
 ENV PYTHONUNBUFFERED=1 \

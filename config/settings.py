@@ -47,12 +47,14 @@ INSTALLED_APPS = [
     'django_filters',
     
     # Local apps
+    'core',
     'professionals',
     'appointments',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",  # CORS deve vir ANTES do CommonMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -196,4 +198,62 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+# CORS Configuration
+# Obter o ambiente (development, staging, production)
+ENVIRONMENT = config('ENVIRONMENT', default='development')
+
+if ENVIRONMENT == 'production':
+    # Produção - Mais restritivo
+    CORS_ALLOWED_ORIGINS = [
+        "https://lacrei.com",
+        "https://www.lacrei.com",
+    ]
+    CORS_ALLOW_CREDENTIALS = True
+    
+elif ENVIRONMENT == 'staging':
+    # Staging - Menos restritivo que produção
+    CORS_ALLOWED_ORIGINS = [
+        "https://staging.lacrei.com",
+        "http://localhost:3000",
+        "http://localhost:5173",  # Vite
+    ]
+    CORS_ALLOW_CREDENTIALS = True
+    
+else:
+    # Development - Mais permissivo para facilitar desenvolvimento
+    CORS_ALLOW_ALL_ORIGINS = True  # Permite qualquer origem em dev
+    CORS_ALLOW_CREDENTIALS = True
+
+# Headers permitidos
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Métodos HTTP permitidos
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Expor headers específicos para o frontend
+CORS_EXPOSE_HEADERS = [
+    'Content-Type',
+    'X-CSRFToken',
+]
+
+# Tempo de cache para preflight requests (em segundos)
+CORS_PREFLIGHT_MAX_AGE = 86400  # 24 horas
 

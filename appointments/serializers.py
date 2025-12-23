@@ -3,6 +3,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Appointment
 from professionals.serializers import ProfessionalSerializer
+from core.validators import sanitize_html, validate_no_sql_injection
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -101,14 +102,32 @@ class AppointmentSerializer(serializers.ModelSerializer):
             )
         return value
     
+    def validate_paciente_nome(self, value):
+        """Sanitiza e valida nome do paciente"""
+        validate_no_sql_injection(value)
+        return sanitize_html(value)
+    
+    def validate_paciente_email(self, value):
+        """Valida email do paciente"""
+        validate_no_sql_injection(value)
+        return value.lower()
+    
     def validate_paciente_telefone(self, value):
         """Valida e formata telefone"""
         import re
+        validate_no_sql_injection(value)
         clean = re.sub(r'\D', '', value)
         if len(clean) < 10 or len(clean) > 11:
             raise serializers.ValidationError(
                 "Telefone inválido. Use formato: (11) 99999-9999"
             )
+        return value
+    
+    def validate_observacoes(self, value):
+        """Sanitiza observações"""
+        if value:
+            validate_no_sql_injection(value)
+            return sanitize_html(value)
         return value
     
     def validate(self, data):
