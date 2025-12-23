@@ -91,7 +91,8 @@ jobs:
           poetry config virtualenvs.create false
 
       - name: Install dependencies
-        run: poetry install --no-root
+        run: |
+          poetry install --no-root || poetry install
 
       - name: Run migrations
         env:
