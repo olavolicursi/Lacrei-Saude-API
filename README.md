@@ -13,18 +13,21 @@ API funcional, segura e pronta para produção, desenvolvida com foco em qualida
 
 ### ✨ Funcionalidades
 
-- ✅ CRUD completo de profissionais da saúde
-- ✅ CRUD completo de consultas médicas
-- ✅ Busca de consultas por profissional
-- ✅ Autenticação JWT
-- ✅ Validação e sanitização de dados
-- ✅ Proteção contra SQL Injection e XSS
-- ✅ CORS configurado
-- ✅ Logs de segurança e acesso
-- ✅ Testes automatizados (80%+ cobertura)
-- ✅ Docker e Docker Compose
-- ✅ CI/CD com GitHub Actions
-- ✅ Deploy em AWS (Staging e Produção)
+- ✅ **CRUD completo de profissionais da saúde**
+- ✅ **CRUD completo de consultas médicas**
+- ✅ **Busca de consultas por profissional**
+- ✅ **Autenticação JWT** (access + refresh tokens)
+- ✅ **Validação e sanitização de dados**
+- ✅ **Proteção contra SQL Injection e XSS**
+- ✅ **CORS configurado** por ambiente
+- ✅ **Logs de segurança e acesso** estruturados
+- ✅ **Testes automatizados** (80%+ cobertura)
+- ✅ **Docker e Docker Compose** (3 serviços)
+- ✅ **Health check endpoint** (`/api/v1/health/`)
+- ✅ **Nginx como proxy reverso**
+- ✅ **Gunicorn** servidor WSGI de produção
+- ⏳ **CI/CD com GitHub Actions** (FASE 7)
+- ⏳ **Deploy em AWS** (FASE 8 - Staging e Produção)
 
 ## 🚀 Quick Start
 
@@ -85,24 +88,88 @@ Acesse: http://localhost:8000
 
 ### 🐳 Instalação com Docker (Recomendado)
 
+A forma mais rápida e confiável de rodar a aplicação é usando Docker Compose.
+
 1. **Clone e configure:**
 
 ```bash
 git clone https://github.com/seu-usuario/Lacrei-Saude-API.git
 cd Lacrei-Saude-API
-cp .env.example .env
+cp .env.docker .env  # Use o template Docker
 ```
 
 2. **Inicie os containers:**
 
 ```bash
-docker-compose up --build
+docker-compose up --build -d
 ```
 
-3. **Acesse a aplicação:**
+Isso irá:
+- ✅ Construir a imagem Docker da aplicação
+- ✅ Iniciar PostgreSQL 15
+- ✅ Executar migrations automaticamente
+- ✅ Coletar arquivos estáticos
+- ✅ Criar superuser (admin/admin123)
+- ✅ Iniciar Gunicorn com 3 workers
+- ✅ Configurar Nginx como proxy reverso
 
-- API: http://localhost:8000
-- Admin: http://localhost:8000/admin
+3. **Verifique os containers:**
+
+```bash
+docker-compose ps
+```
+
+Você deve ver 3 containers rodando:
+- `lacrei-db` (PostgreSQL) - healthy
+- `lacrei-web` (Django + Gunicorn) - healthy  
+- `lacrei-nginx` (Nginx) - running
+
+4. **Acesse a aplicação:**
+
+- **API:** http://localhost:8000
+- **Admin:** http://localhost:8000/admin 
+- **Health Check:** http://localhost:8000/api/v1/health/
+- **Nginx (proxy):** http://localhost
+
+5. **Ver logs:**
+
+```bash
+# Todos os serviços
+docker-compose logs -f
+
+# Apenas a aplicação
+docker-compose logs -f web
+
+# Apenas o banco
+docker-compose logs -f db
+```
+
+6. **Comandos úteis:**
+
+```bash
+# Executar migrations
+docker-compose exec web python manage.py migrate
+
+# Criar superuser adicional
+docker-compose exec web python manage.py createsuperuser
+
+# Executar testes
+docker-compose exec web pytest
+
+# Acessar shell Django
+docker-compose exec web python manage.py shell
+
+# Acessar bash no container
+docker-compose exec web bash
+
+# Parar containers
+docker-compose down
+
+# Parar e remover volumes (reset completo)
+docker-compose down -v
+```
+
+**📚 Documentação completa do Docker:** [docker/README.md](docker/README.md)
 
 ## 📚 Documentação da API
 
@@ -187,7 +254,133 @@ poetry run pytest tests/test_security.py
 ### Rodar testes no Docker
 
 ```bash
-docker-compose run --rm web pytest
+docker-compose exec web pytest
+docker-compose exec web pytest --cov
+```
+
+## 🐳 Docker - Informações Detalhadas
+
+### Dockerfile
+
+O projeto usa um Dockerfile otimizado multi-stage:
+
+**Características:**
+- Base: `python:3.13-slim` (imagem oficial leve)
+- Poetry instalado para gerenciamento de dependências
+- Dependências do sistema: gcc, postgresql-client, netcat
+- Healthcheck integrado que verifica `/api/v1/health/`
+- Servidor: Gunicorn com 3 workers e timeout de 60s
+- Diretórios criados automaticamente: staticfiles, media, logs
+
+**Build manual da imagem:**
+
+```bash
+# Build
+docker build -t lacrei-api:latest .
+
+# Run (sem docker-compose)
+docker run -d \
+  -p 8000:8000 \
+  -e DB_HOST=host.docker.internal \
+  -e DB_PORT=5432 \
+  -e DB_NAME=lacrei_db \
+  -e DB_USER=lacrei_user \
+  -e DB_PASSWORD=lacrei_pass \
+  --name lacrei-web \
+  lacrei-api:latest
+```
+
+### Docker Compose
+
+O `docker-compose.yml` orquestra todos os serviços necessários:
+
+**Recursos:**
+- Networking automático entre containers
+- Volumes persistentes para dados
+- Healthchecks para garantir disponibilidade
+- Variáveis de ambiente configuráveis via `.env`
+- Dependências gerenciadas (web espera db estar healthy)
+
+**Arquivo de configuração:** `.env.docker`
+
+```env
+# Copie para .env e ajuste conforme necessário
+DEBUG=True
+SECRET_KEY=change-this-in-production
+ALLOWED_HOSTS=localhost,127.0.0.1,web
+
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=lacrei_db
+DB_USER=lacrei_user
+DB_PASSWORD=lacrei_pass
+
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@lacrei.com
+DJANGO_SUPERUSER_PASSWORD=admin123
+```
+
+### Entrypoint Script
+
+O script `docker/entrypoint.sh` é executado na inicialização e:
+
+1. ✅ Aguarda PostgreSQL ficar disponível
+2. ✅ Cria diretórios necessários (logs, static, media)
+3. ✅ Executa migrations automaticamente
+4. ✅ Coleta arquivos estáticos
+5. ✅ Cria superuser se não existir
+6. ✅ Inicia a aplicação (Gunicorn)
+
+### Nginx
+
+Configuração em `docker/nginx.conf`:
+
+- **Proxy reverso:** Encaminha requisições para Django (porta 8000)
+- **Static files:** Serve diretamente `/static/` e `/media/`
+- **Headers de segurança:** X-Frame-Options, X-Content-Type-Options, etc.
+- **Cache:** Headers otimizados para performance
+- **Timeouts:** Configurados para 60s
+
+### Volumes Docker
+
+```bash
+# Ver volumes criados
+docker volume ls | grep lacrei
+
+# Inspecionar volume
+docker volume inspect lacrei-saude-api_postgres_data
+
+# Backup do banco de dados
+docker-compose exec db pg_dump -U lacrei_user lacrei_db > backup.sql
+
+# Restore do backup
+docker-compose exec -T db psql -U lacrei_user lacrei_db < backup.sql
+```
+
+### Troubleshooting Docker
+
+**Problema: Container não inicia**
+```bash
+docker-compose logs web
+docker-compose restart web
+```
+
+**Problema: Porta já em uso**
+```bash
+# Alterar porta no docker-compose.yml
+ports:
+  - "8080:8000"  # Usa 8080 no host ao invés de 8000
+```
+
+**Problema: Migrations não aplicadas**
+```bash
+docker-compose exec web python manage.py migrate
+```
+
+**Reset completo:**
+```bash
+docker-compose down -v  # Remove volumes
+docker-compose up --build -d
 ```
 
 ## 🔒 Segurança
@@ -231,6 +424,8 @@ nome = "'; DROP TABLE users; --"
 
 ## 🏗️ Arquitetura
 
+### Arquitetura de Produção (AWS)
+
 ```
 ┌─────────────┐
 │   Cliente   │
@@ -257,6 +452,61 @@ nome = "'; DROP TABLE users; --"
 │PostgreSQL│  │   Redis    │
 └─────────┘  └────────────┘
 ```
+
+### Arquitetura Docker Local
+
+```
+┌──────────────────────────────────────┐
+│          docker-compose              │
+├──────────────────────────────────────┤
+│                                      │
+│  ┌────────────┐    ┌─────────────┐ │
+│  │   Nginx    │◄───┤   Django    │ │
+│  │  (port 80) │    │  + Gunicorn │ │
+│  │            │    │  (port 8000)│ │
+│  └────────────┘    └──────┬──────┘ │
+│                           │         │
+│                           ▼         │
+│                    ┌──────────────┐ │
+│                    │  PostgreSQL  │ │
+│                    │   (port     │ │
+│                    │    5432)     │ │
+│                    └──────────────┘ │
+│                                      │
+│  Volumes:                            │
+│  • postgres_data (persistente)       │
+│  • static_volume (estáticos)         │
+│  • media_volume (uploads)            │
+└──────────────────────────────────────┘
+```
+
+**Serviços Docker:**
+
+1. **db (PostgreSQL 15)**
+   - Banco de dados principal
+   - Healthcheck configurado
+   - Volume persistente para dados
+
+2. **web (Django + Gunicorn)**
+   - Aplicação Python/Django
+   - 3 workers Gunicorn
+   - Auto-reload em desenvolvimento
+   - Migrations e collectstatic automáticos
+
+3. **nginx (Nginx Alpine)**
+   - Proxy reverso
+   - Serve arquivos estáticos
+   - Headers de segurança
+   - Cache otimizado
+
+**Características:**
+
+- ✅ **Inicialização automática:** Migrations, collectstatic e superuser
+- ✅ **Healthchecks:** Monitora saúde de db e web
+- ✅ **Hot reload:** Código atualiza automaticamente em dev
+- ✅ **Logs estruturados:** Todos os logs acessíveis via `docker-compose logs`
+- ✅ **Isolamento:** Cada serviço em container separado
+- ✅ **Persistência:** Dados do banco mantidos em volumes
 
 ## 📦 Estrutura do Projeto
 
@@ -367,9 +617,13 @@ git push origin main
 
 - [Plano de Implementação](PLANO_IMPLEMENTACAO.md) - Guia completo fase por fase
 - [Checklist](CHECKLIST.md) - Lista de verificação de todas as tarefas
+- [Docker - Guia Completo](docker/README.md) - Documentação detalhada do Docker
+- [FASE 6 - Docker Completa](FASE_6_DOCKER_COMPLETA.md) - Implementação da containerização
+- [Checklist Docker](CHECKLIST_FASE_6.md) - Verificação de funcionalidades Docker
 - [Decisões Técnicas](docs/DECISOES_TECNICAS.md) - Justificativas das escolhas
 - [Diário de Desenvolvimento](docs/DIARIO.md) - Problemas e soluções
 - [Estratégia de Rollback](docs/ROLLBACK.md) - Procedimentos de rollback
+- [Validações e Segurança](core/README.md) - Sanitização e validação de inputs
 
 ## 🤝 Contribuindo
 

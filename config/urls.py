@@ -25,6 +25,7 @@ from rest_framework_simplejwt.views import (
 )
 from professionals.views import ProfessionalViewSet
 from appointments.views import AppointmentViewSet
+from core.views import health_check
 
 router = DefaultRouter()
 router.register('professionals', ProfessionalViewSet)
@@ -32,6 +33,9 @@ router.register('appointments', AppointmentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Health check
+    path('api/v1/health/', health_check, name='health_check'),
     
     # API v1
     path('api/v1/', include(router.urls)),
