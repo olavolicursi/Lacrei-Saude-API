@@ -44,3 +44,6 @@ class Appointment(models.Model):
                 name='duracao_minima_15min'
             )
         ]
+
+    def __str__(self):
+        return f"Consulta com {self.professional.nome_social} em {self.data_hora.strftime('%Y-%m-%d %H:%M')} - {self.paciente_nome}"

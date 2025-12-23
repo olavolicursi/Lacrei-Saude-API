@@ -37,3 +37,6 @@ class Professional(models.Model):
             models.Index(fields=['email']),
             models.Index(fields=['registro_profissional']),
         ]
+    
+    def __str__(self):
+        return f"{self.nome_social} - {self.get_profissao_display()} ({self.registro_profissional})"
