@@ -4,6 +4,48 @@ Este documento descreve todas as configurações de segurança implementadas na 
 
 ---
 
+## ⚠️ IMPORTANTE - Arquivos Sensíveis
+
+### 🚨 Arquivos que NÃO devem ser commitados
+
+Os seguintes arquivos contêm informações sensíveis e **NÃO** estão versionados:
+
+- `.env.docker` - Credenciais de banco de dados e secrets
+- `docker-compose.yml` - Configuração com senhas
+- `.env` - Variáveis de ambiente locais
+- `*.env` - Qualquer arquivo de ambiente
+
+### ✅ Arquivos de Exemplo (Versionados)
+
+Use estes templates para criar suas configurações:
+
+- `.env.docker.example` - Template para Docker
+- `docker-compose.example.yml` - Template do Docker Compose
+- `.env.example` - Template para desenvolvimento local
+
+### 🔧 Configuração Inicial
+
+1. **Copie os arquivos de exemplo:**
+
+```bash
+cp .env.docker.example .env.docker
+cp docker-compose.example.yml docker-compose.yml
+```
+
+2. **Edite com credenciais REAIS:**
+
+```bash
+# Gere uma SECRET_KEY forte
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+
+# Edite o arquivo
+nano .env.docker  # ou notepad .env.docker no Windows
+```
+
+3. **Nunca commite estes arquivos!**
+
+---
+
 ## 🎯 Visão Geral
 
 A API implementa múltiplas camadas de segurança seguindo as melhores práticas recomendadas pela OWASP e Django Security Guidelines.

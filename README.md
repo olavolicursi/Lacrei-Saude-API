@@ -90,21 +90,44 @@ Acesse: http://localhost:8000
 
 A forma mais rápida e confiável de rodar a aplicação é usando Docker Compose.
 
+> ⚠️ **IMPORTANTE - Segurança:** Os arquivos `.env.docker` e `docker-compose.yml` contêm informações sensíveis e **NÃO** estão versionados. Você deve criá-los a partir dos exemplos fornecidos.
+
 1. **Clone e configure:**
 
 ```bash
 git clone https://github.com/seu-usuario/Lacrei-Saude-API.git
 cd Lacrei-Saude-API
-cp .env.docker .env  # Use o template Docker
+
+# Copie os arquivos de exemplo
+cp .env.docker.example .env.docker
+cp docker-compose.example.yml docker-compose.yml
 ```
 
-2. **Inicie os containers:**
+2. **Edite `.env.docker` com suas credenciais reais:**
+
+```bash
+# No Windows
+notepad .env.docker
+
+# No Linux/Mac
+nano .env.docker
+```
+
+**Altere pelo menos estas variáveis:**
+
+- `SECRET_KEY` - Gere uma chave secreta forte (50+ caracteres)
+- `DB_USER` - Usuário do PostgreSQL
+- `DB_PASSWORD` - Senha segura do banco de dados
+- `DJANGO_SUPERUSER_PASSWORD` - Senha do admin
+
+3. **Inicie os containers:**
 
 ```bash
 docker-compose up --build -d
 ```
 
 Isso irá:
+
 - ✅ Construir a imagem Docker da aplicação
 - ✅ Iniciar PostgreSQL 15
 - ✅ Executar migrations automaticamente
@@ -120,14 +143,15 @@ docker-compose ps
 ```
 
 Você deve ver 3 containers rodando:
+
 - `lacrei-db` (PostgreSQL) - healthy
-- `lacrei-web` (Django + Gunicorn) - healthy  
+- `lacrei-web` (Django + Gunicorn) - healthy
 - `lacrei-nginx` (Nginx) - running
 
 4. **Acesse a aplicação:**
 
 - **API:** http://localhost:8000
-- **Admin:** http://localhost:8000/admin 
+- **Admin:** http://localhost:8000/admin
 - **Health Check:** http://localhost:8000/api/v1/health/
 - **Nginx (proxy):** http://localhost
 
@@ -265,6 +289,7 @@ docker-compose exec web pytest --cov
 O projeto usa um Dockerfile otimizado multi-stage:
 
 **Características:**
+
 - Base: `python:3.13-slim` (imagem oficial leve)
 - Poetry instalado para gerenciamento de dependências
 - Dependências do sistema: gcc, postgresql-client, netcat
@@ -295,6 +320,7 @@ docker run -d \
 O `docker-compose.yml` orquestra todos os serviços necessários:
 
 **Recursos:**
+
 - Networking automático entre containers
 - Volumes persistentes para dados
 - Healthchecks para garantir disponibilidade
@@ -360,12 +386,14 @@ docker-compose exec -T db psql -U lacrei_user lacrei_db < backup.sql
 ### Troubleshooting Docker
 
 **Problema: Container não inicia**
+
 ```bash
 docker-compose logs web
 docker-compose restart web
 ```
 
 **Problema: Porta já em uso**
+
 ```bash
 # Alterar porta no docker-compose.yml
 ports:
@@ -373,11 +401,13 @@ ports:
 ```
 
 **Problema: Migrations não aplicadas**
+
 ```bash
 docker-compose exec web python manage.py migrate
 ```
 
 **Reset completo:**
+
 ```bash
 docker-compose down -v  # Remove volumes
 docker-compose up --build -d
@@ -401,6 +431,7 @@ Este projeto implementa diversas camadas de segurança:
 A API implementa validadores customizados no módulo `core` para proteger contra ataques:
 
 **Proteção contra XSS (Cross-Site Scripting):**
+
 ```python
 # Entrada maliciosa
 nome = "<script>alert('XSS')</script>Dr. João Silva"
@@ -408,6 +439,7 @@ nome = "<script>alert('XSS')</script>Dr. João Silva"
 ```
 
 **Proteção contra SQL Injection:**
+
 ```python
 # Entrada maliciosa
 nome = "'; DROP TABLE users; --"
@@ -415,6 +447,7 @@ nome = "'; DROP TABLE users; --"
 ```
 
 **Campos protegidos automaticamente:**
+
 - **Professional:** nome_social, logradouro, complemento, bairro, cidade, email, telefone
 - **Appointment:** paciente_nome, paciente_email, paciente_telefone, observacoes
 
@@ -483,11 +516,13 @@ nome = "'; DROP TABLE users; --"
 **Serviços Docker:**
 
 1. **db (PostgreSQL 15)**
+
    - Banco de dados principal
    - Healthcheck configurado
    - Volume persistente para dados
 
 2. **web (Django + Gunicorn)**
+
    - Aplicação Python/Django
    - 3 workers Gunicorn
    - Auto-reload em desenvolvimento
